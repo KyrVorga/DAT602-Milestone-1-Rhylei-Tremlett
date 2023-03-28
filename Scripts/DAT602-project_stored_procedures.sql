@@ -1,5 +1,62 @@
 use battlespire;
+        
+drop procedure if exists CreateAccount;
+delimiter //
+create procedure CreateAccount(in _username varchar(50), in _email varchar(100), in _password varchar(50))
+begin
 
+	case
+		when _email in (
+			select email
+			from account
+		)
+		then select 'Error' as message;
+		when _username in (
+			select username
+			from account
+		)
+		then select 'Error' as message;
+		else insert into account (username, email, password)
+	    values (_username, _email, _password);
+	end case;
+
+	select 'User Created' as message;
+end //
+delimiter ;     
+
+
+       
+drop procedure if exists LoginAccount;
+delimiter //
+create procedure LoginAccount(in _username varchar(50), in _password varchar(50))
+login:begin
+		if (
+			select attempts
+			from account
+			where username = _username
+		) >= 5
+		then
+			select 'Error' as message;
+			leave login;
+		end if;
+		
+		if (
+			select username
+			from account
+			where username = _username
+			and password = _password
+		) = _username
+		then
+			select 'Login succesful.' as message;
+		else
+			select 'Error' as message;
+		end if;
+
+end //
+delimiter ;  
+
+
+        
 drop procedure if exists GenerateMap;
 delimiter //
 create procedure GenerateMap( in _width int, in _height int)
@@ -516,7 +573,18 @@ end //
 delimiter ;
 
 
-
+drop procedure if exists GetChatHistory;
+delimiter //
+create procedure GetChatHistory()
+begin
+	
+	select concat('<',time(m.sent_time),'> ',a.username,': ', message) as message
+	from message m
+	join account a
+	on m.account_id = a.account_id;
+	
+end //
+delimiter ;
 
 
 drop procedure if exists SendMessage;

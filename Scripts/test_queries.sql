@@ -21,7 +21,7 @@ select * from tile where tile_type = 'inventory';
 -- above is an low exponential function
 
 
-
+call CreateAccount("Pax", "pax@mars.net", "password");
 
 
 call CreatePlayer(1) 
@@ -39,4 +39,9 @@ if (select tile_id from tile where x = _x and y = _y and tile_type = "inventory"
 	then select "exists";
 end if;
 
+
+select concat('<',m.sent_time,'> ',a.username,': ', message) 
+from message m
+join account a
+on m.account_id = a.account_id 
 

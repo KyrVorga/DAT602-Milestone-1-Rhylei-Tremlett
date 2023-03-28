@@ -22,12 +22,18 @@ namespace StageOne
         }
 
         private void update_chat_button_Click(object sender, EventArgs e)
-        {
-            List<String> list = chat_box.Items;
+        {   var listbox = chat_box.Items;
+            
 
             GameDAO db_connection = new();
 
 
-            list = db_connection.GetChat();
+            List<String> list = db_connection.GetChat();
+
+            list.ForEach(item =>
+            {
+                listbox.Add(item);
+            });
+        }
     }
 }
