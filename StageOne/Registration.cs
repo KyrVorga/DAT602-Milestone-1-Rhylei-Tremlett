@@ -14,8 +14,16 @@ namespace StageOne
 {
     public partial class Registration : Form
     {
+
+        private Login _login_form;
         public Registration()
         {
+            InitializeComponent();
+        }
+        public Registration(Login? login)
+            : this()
+        {
+            _login_form = login;
             InitializeComponent();
         }
 
@@ -36,9 +44,16 @@ namespace StageOne
             {
                 MessageBox.Show("Account created successfully.");
                 this.Hide();
-                //Game game = new Game(this);
-                //game.Show();
+                Login login = new Login(this);
+                login.Show();
             }
+        }
+
+        private void redirect_label_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            this.Hide();
+            Login login = new Login(this);
+            login.Show();
         }
     }
 }
