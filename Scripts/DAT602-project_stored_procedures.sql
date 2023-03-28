@@ -42,41 +42,48 @@ end //
 delimiter ;
 
 
-drop procedure if exists GetPlayerID;
+drop function if exists GetPlayerID;
 delimiter //
-create procedure GetPlayerID(in _account_id int, out _player_id int)
+create function GetPlayerID(_account_id int)
+returns int deterministic
 begin
-
+	declare _player_id int;
+	
 	select e.entity_id
 	into _player_id
 	from entity e
 	where e.entity_type = "player"
 	and e.account_id = _account_id;
 
+	return _player_id;
 end //
 delimiter ;
 
 
-
-drop procedure if exists GetEntityIDFromInventoryTile;
+drop function if exists GetEntityIDFromInventoryTile;
 delimiter //
-create procedure GetEntityIDFromInventoryTile(in _tile_id int, out _entity_id int)
+create function GetEntityIDFromInventoryTile(_tile_id int)
+returns int deterministic
 begin
+	declare _entity_id int;
 	
 	select owner_id
 	into _entity_id
 	from entity
 	where tile_id = _tile_id;
 
+	return _entity_id;
 end //
 delimiter ;
 
 
 
-drop procedure if exists GetChestIDFromTile;
+drop function if exists GetChestIDFromTile;
 delimiter //
-create procedure GetChestIDFromTile(in _tile_id int, out _chest_id int)
+create function GetChestIDFromTile(_tile_id int)
+returns int deterministic
 begin
+	declare _chest_id int;
 	
 	select entity_id
 	into _chest_id
@@ -84,14 +91,17 @@ begin
 	where entity_type = "chest"
 	and tile_id = _tile_id;
 
+	return _chest_id;
 end //
 delimiter ;
 
 
-drop procedure if exists GetChestIDFromItem;
+drop function if exists GetChestIDFromItem;
 delimiter //
-create procedure GetChestIDFromItem(in _item_id int, out _chest_id int)
+create function GetChestIDFromItem(_item_id int)
+returns int deterministic
 begin
+	declare _chest_id int;
 	
 	select e.owner_id
 	into _chest_id
@@ -99,6 +109,7 @@ begin
 	where e.entity_type = "item"
 	and e.entity_id = _item_id;
 
+	return _chest_id;
 end //
 delimiter ;
 
@@ -162,8 +173,8 @@ begin
 	declare _origin_tile_owner int;
 	declare _target_tile_owner int;
 
-	call GetEntityIDFromInventoryTile(_origin_tile_id, _origin_tile_owner);
-	call GetEntityIDFromInventoryTile(_target_tile_id, _target_tile_owner);
+	set _origin_tile_owner = GetEntityIDFromInventoryTile(_origin_tile_id);
+	set _target_tile_owner = GetEntityIDFromInventoryTile(_target_tile_id);
 
 	
 	update entity 
@@ -193,101 +204,29 @@ end //
 delimiter ;
 
 
-drop procedure if exists PlayerEquipItem;
+-- drop procedure if exists PlayerEquipItem;
+-- delimiter //
+-- create procedure PlayerEquipItem(in _item_id int)
+-- begin
+-- 	
+-- 	update entity 
+-- 	set is_equipped = true
+-- 	where entity_id = _item_id;
+-- 
+-- 	-- change the tile to the players respective equipment slot.
+-- 		
+-- end //
+-- delimiter ;
+
+
+
+drop function if exists CalculateTier;
 delimiter //
-create procedure PlayerEquipItem(in _item_id int)
+create function CalculateTier(_distance int)
+returns varchar(10) deterministic
 begin
+	declare _tier varchar(10);
 	
-	update entity 
-	set is_equipped = true
-	where entity_id = _item_id;
-
-	-- change the tile to the players respective equipment slot.
-		
-end //
-delimiter ;
-
-
-
-drop procedure if exists GetPlayerItems;
-delimiter //
-create procedure GetPlayerItems(in _account_id int)
-begin
-	
-	-- get the id of the player and store it in player_id
-	declare _player_id int;
-	call GetPlayerID(_account_id, _player_id);
-		
-	select *
-	from entity e 
-	where owner_id = _player_id;
-
-end //
-delimiter ;
-
-
-
-drop procedure if exists GetChestItems;
-delimiter //
-create procedure GetChestItems(in _chest_id int)
-begin
-
-	select *
-	from entity e 
-	where owner_id = _chest_id;
-
-end //
-delimiter ;
-
-
-
-drop procedure if exists CreateItem;
-delimiter //
-create procedure CreateItem(in _chest_id int)
-begin
-	declare _health int default 0;
-	declare _attack int default 0;
-	declare _defense int default 0;
-	declare _healing int default 0;
-	
-	declare _type_mod int;
-	declare _item_type varchar(50) default "Sword";
-	declare _tier varchar(10) default "I";
-	
-	declare _x int;
-	declare _y int;
-	declare _inventory_tile int;
-
-
-	-- find the distance of the chest from the center
-	declare _distance int;
-	select ceil(sqrt(pow(abs(t.x), 2) + pow(abs(t.x), 2)))
-	into _distance
-	from entity e 
-	join tile t on t.tile_id = e.tile_id
-	where e.entity_id = _chest_id;
-
-	set _type_mod = ceil(rand() *4);
-
-	if _type_mod = 1 then
-		set _item_type = "Armour ";
-		set _health = pow(_distance, 1.25);
-	end if;
-	if _type_mod = 2 then
-		set _item_type = "Sword ";
-		set _attack = pow(_distance, 1.25) / 5;
-	end if;
-	if _type_mod = 3 then
-		set _item_type = "Shield ";
-		set _defense = pow(_distance, 1.25) / 5;
-	end if;
-	if _type_mod = 4 then
-		set _item_type = "Amulet ";
-		set _healing = pow(_distance, 1.25) / 10;
-	end if;
-	
-	
-	-- determine the tier
 	if pow(_distance, 1.25) >= 488.28125 then
 		set _tier = "II";
 	end if;
@@ -315,6 +254,90 @@ begin
 	if pow(_distance, 1.25) >= 125000 then
 		set _tier = "X";
 	end if;
+
+	return _tier;
+end //
+delimiter ;
+
+drop procedure if exists CreateItem;
+delimiter //
+create procedure CreateItem(in _chest_id int)
+begin
+	declare _health int default 0;
+	declare _attack int default 0;
+	declare _defense int default 0;
+	declare _healing int default 0;
+	
+	declare _type_mod int;
+	declare _item_type varchar(50) default "Sword";
+	declare _tier varchar(10) default "I";
+	
+	declare _x int;
+	declare _y int;
+	declare _inventory_tile int;
+
+
+	-- find the distance of the chest from the center
+	declare _distance int;
+
+	select ceil(sqrt(pow(abs(t.x), 2) + pow(abs(t.x), 2)))
+	into _distance
+	from entity e 
+	join tile t
+		on t.tile_id = e.tile_id
+	where
+		e.entity_id = _chest_id;
+
+
+	set _type_mod = ceil(rand() *4);
+
+	if _type_mod = 1 then
+		set _item_type = "Armour ";
+		set _health = pow(_distance, 1.25);
+	end if;
+	if _type_mod = 2 then
+		set _item_type = "Sword ";
+		set _attack = pow(_distance, 1.25) / 5;
+	end if;
+	if _type_mod = 3 then
+		set _item_type = "Shield ";
+		set _defense = pow(_distance, 1.25) / 5;
+	end if;
+	if _type_mod = 4 then
+		set _item_type = "Amulet ";
+		set _healing = pow(_distance, 1.25) / 10;
+	end if;
+	
+	
+	-- determine the tier
+    set _tier = CalculateTier(_distance);
+-- 	if pow(_distance, 1.25) >= 488.28125 then
+-- 		set _tier = "II";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 976.5625 then
+-- 		set _tier = "III";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 1953.125 then
+-- 		set _tier = "IV";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 3906.25 then
+-- 		set _tier = "V";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 7812.5 then
+-- 		set _tier = "VI";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 15625 then
+-- 		set _tier = "VII";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 31250 then
+-- 		set _tier = "VIII";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 62500 then
+-- 		set _tier = "IX";
+-- 	end if;
+-- 	if pow(_distance, 1.25) >= 125000 then
+-- 		set _tier = "X";
+-- 	end if;
 	
 	inventory_tile_loop: loop
 		set _x = ceil(rand() *8);
@@ -356,7 +379,7 @@ begin
 	insert into entity (entity_type, tile_id)
 	values ("chest", _tile_id);
 
-	call GetChestIDFromTile(_tile_id, _chest_id);
+	set _chest_id =  GetChestIDFromTile(_tile_id);
 
 	call GenerateInventory(_chest_id, 8, 4);
 
