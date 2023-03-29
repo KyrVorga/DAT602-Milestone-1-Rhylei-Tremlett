@@ -573,6 +573,32 @@ end //
 delimiter ;
 
 
+drop procedure if exists IsAdminAccount;
+delimiter //
+create procedure IsAdminAccount(in _username varchar(50))
+begin
+	
+	select is_administrator 
+	from account
+	where username =_username;
+	
+end //
+delimiter ;
+
+
+
+drop procedure if exists GetLeaderboard;
+delimiter //
+create procedure GetLeaderboard()
+begin
+	
+	select concat(username, ': ', highscore)
+	from account;
+	
+end //
+delimiter ;
+
+
 drop procedure if exists GetChatHistory;
 delimiter //
 create procedure GetChatHistory()

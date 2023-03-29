@@ -34,6 +34,8 @@
             this.label_chat = new System.Windows.Forms.Label();
             this.chat_input = new System.Windows.Forms.TextBox();
             this.update_chat_button = new System.Windows.Forms.Button();
+            this.update_leaderboard_button = new System.Windows.Forms.Button();
+            this.settings_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // leaderboard_box
@@ -90,15 +92,37 @@
             this.update_chat_button.Name = "update_chat_button";
             this.update_chat_button.Size = new System.Drawing.Size(128, 34);
             this.update_chat_button.TabIndex = 5;
-            this.update_chat_button.Text = "Update Chat";
+            this.update_chat_button.Text = "Update";
             this.update_chat_button.UseVisualStyleBackColor = true;
             this.update_chat_button.Click += new System.EventHandler(this.update_chat_button_Click);
+            // 
+            // update_leaderboard_button
+            // 
+            this.update_leaderboard_button.Location = new System.Drawing.Point(139, 7);
+            this.update_leaderboard_button.Name = "update_leaderboard_button";
+            this.update_leaderboard_button.Size = new System.Drawing.Size(128, 34);
+            this.update_leaderboard_button.TabIndex = 6;
+            this.update_leaderboard_button.Text = "Update";
+            this.update_leaderboard_button.UseVisualStyleBackColor = true;
+            this.update_leaderboard_button.Click += new System.EventHandler(this.update_leaderboard_button_Click);
+            // 
+            // settings_button
+            // 
+            this.settings_button.Location = new System.Drawing.Point(928, 19);
+            this.settings_button.Name = "settings_button";
+            this.settings_button.Size = new System.Drawing.Size(90, 41);
+            this.settings_button.TabIndex = 7;
+            this.settings_button.Text = "Settings";
+            this.settings_button.UseVisualStyleBackColor = true;
+            this.settings_button.Click += new System.EventHandler(this.settings_button_Click);
             // 
             // Game
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1042, 581);
+            this.Controls.Add(this.settings_button);
+            this.Controls.Add(this.update_leaderboard_button);
             this.Controls.Add(this.update_chat_button);
             this.Controls.Add(this.chat_input);
             this.Controls.Add(this.label_chat);
@@ -120,5 +144,7 @@
         private Label label_chat;
         private TextBox chat_input;
         private Button update_chat_button;
+        private Button update_leaderboard_button;
+        private Button settings_button;
     }
 }

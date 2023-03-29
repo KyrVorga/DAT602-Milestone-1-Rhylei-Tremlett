@@ -14,7 +14,12 @@ namespace StageOne
     public partial class Login : Form
     {
         private Registration _registration_form;
-        public Login(Registration register)
+        public Login()
+        {
+            InitializeComponent();
+        }
+        public Login(Registration? register)
+            : this()
         {
             _registration_form = register;
             InitializeComponent();

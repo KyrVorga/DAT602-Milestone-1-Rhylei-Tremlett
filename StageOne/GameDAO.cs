@@ -26,9 +26,40 @@ namespace StageOne
             return chat_messages;
         }
 
-        public String[] GetLeaderboard()
+        public List<String> GetLeaderboard()
         {
-            return new String[0];
+            DataSet leaderboard_raw = MySqlHelper.ExecuteDataset(DatabaseAccessObject.MySqlConnection, "call GetLeaderboard();");
+
+            var leaderboard_list = new List<String>();
+            foreach (DataRow row in leaderboard_raw.Tables[0].Rows)
+            {
+                leaderboard_list.Add(row[0].ToString());
+            }
+
+            return leaderboard_list;
+        }
+
+
+        public Boolean checkIsAdmin(String username_param)
+        {
+            List<MySqlParameter> procedure_params = new List<MySqlParameter>();
+            MySqlParameter username = new("@username", MySqlDbType.VarChar, 50)
+            {
+                Value = username_param
+            };
+            procedure_params.Add(username);
+
+            DataSet admin_result = MySqlHelper.ExecuteDataset(DatabaseAccessObject.MySqlConnection, "call CreateAccount(@username, @email, @password)", procedure_params.ToArray());
+
+            String result = admin_result.Tables[0].Rows[0].ToString();
+
+            if (result == "1")
+            {
+                return true;
+            }
+            else return false;
+            
+
         }
     }
 }

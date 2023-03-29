@@ -45,3 +45,6 @@ from message m
 join account a
 on m.account_id = a.account_id 
 
+select concat(username, ': ', highscore)
+from account;
+
