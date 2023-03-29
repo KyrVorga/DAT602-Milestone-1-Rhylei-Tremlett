@@ -37,7 +37,7 @@ namespace StageOne
             {
                 MessageBox.Show("Logged in successfully.");
                 this.Hide();
-                Game game = new Game(this);
+                Game game = new Game(this, username);
                 game.Show();
             }
             else

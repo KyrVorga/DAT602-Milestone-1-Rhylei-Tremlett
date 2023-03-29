@@ -10,5 +10,11 @@
     <Compile Update="Registration.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="SettingsAdmin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="SettingsUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

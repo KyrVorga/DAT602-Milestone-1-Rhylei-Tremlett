@@ -78,6 +78,7 @@
             // 
             this.password_input.Location = new System.Drawing.Point(274, 240);
             this.password_input.Name = "password_input";
+            this.password_input.PasswordChar = '*';
             this.password_input.Size = new System.Drawing.Size(294, 31);
             this.password_input.TabIndex = 4;
             // 

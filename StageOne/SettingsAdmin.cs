@@ -12,8 +12,15 @@ namespace StageOne
 {
     public partial class SettingsAdmin : Form
     {
+        private Game _game;
         public SettingsAdmin()
         {
+            InitializeComponent();
+        }
+        public SettingsAdmin(Game? game)
+            : this()
+        {
+            _game = game;
             InitializeComponent();
         }
     }

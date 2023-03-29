@@ -15,10 +15,14 @@ namespace StageOne
     public partial class Game : Form
     {
         private Login _login_form;
+        private SettingsAdmin _settings_admin;
+        private SettingsUser _settings_user;
+        private String _username;
 
-        public Game(Login login)
+        public Game(Login login, String username)
         {
             _login_form = login;
+            _username = username;
             InitializeComponent();
         }
 
@@ -47,8 +51,19 @@ namespace StageOne
         private void settings_button_Click(object sender, EventArgs e)
         {
             GameDAO db_connection = new();
-            Boolean admin_result = db_connection.checkIsAdmin();
-
+            Boolean admin_result = db_connection.checkIsAdmin(_username);
+            if (admin_result)
+            {
+                this.Hide();
+                SettingsAdmin admin = new SettingsAdmin(this);
+                admin.Show();
+            }
+            else
+            {
+                this.Hide();
+                SettingsUser user = new SettingsUser(this);
+                user.Show();
+            }
         }
     }
 }

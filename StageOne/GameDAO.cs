@@ -49,17 +49,16 @@ namespace StageOne
             };
             procedure_params.Add(username);
 
-            DataSet admin_result = MySqlHelper.ExecuteDataset(DatabaseAccessObject.MySqlConnection, "call CreateAccount(@username, @email, @password)", procedure_params.ToArray());
+            DataSet query_result = MySqlHelper.ExecuteDataset(DatabaseAccessObject.MySqlConnection, "call IsAdminAccount(@username)", procedure_params.ToArray());
 
-            String result = admin_result.Tables[0].Rows[0].ToString();
+            DataRow result_row = query_result.Tables[0].Rows[0];
+            string value = result_row.ItemArray[0].ToString();
 
-            if (result == "1")
+            if (value == "True")
             {
                 return true;
             }
             else return false;
-            
-
         }
     }
 }
