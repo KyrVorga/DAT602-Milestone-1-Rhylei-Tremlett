@@ -586,6 +586,18 @@ end //
 delimiter ;
 
 
+drop procedure if exists GetAllPlayers;
+delimiter //
+create procedure GetAllPlayers()
+begin
+	
+	select username
+	from account;
+	
+end //
+delimiter ;
+
+
 
 drop procedure if exists GetLeaderboard;
 delimiter //

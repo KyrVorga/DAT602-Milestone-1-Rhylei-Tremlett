@@ -13,15 +13,16 @@ namespace StageOne
     public partial class SettingsUser : Form
     {
         private Game _game;
-        public SettingsUser()
-        {
-            InitializeComponent();
-        }
-        public SettingsUser(Game? game)
-            : this()
+
+        public SettingsUser(Game game)
         {
             _game = game;
             InitializeComponent();
+        }
+
+        private void SettingsUser_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _game.Show();
         }
     }
 }

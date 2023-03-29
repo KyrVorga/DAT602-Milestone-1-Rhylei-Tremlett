@@ -48,3 +48,7 @@ on m.account_id = a.account_id
 select concat(username, ': ', highscore)
 from account;
 
+
+	select is_administrator 
+	from account
+	where username = "KyrVorga";
