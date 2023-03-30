@@ -117,7 +117,8 @@ begin
     
 	call GenerateMap(40, 40);
 
-	-- add some tiles that are further from the center
+
+	-- add some tiles that are further from the center manually
 	insert into tile (x, y, tile_type)
 	values (100, 250, 'ground');
 	
@@ -146,13 +147,16 @@ begin
         
 	insert into account (username, email, password, is_administrator)
     values 
-		('KyrVorga', 'kyrvorga@mail.com', 'omnis-vir-lupus', true);
+		('KyrVorga', 'kyrvorga@mail.com', 'omnis-vir-lupus', true),
+		('Todd', 'todd@nmit.ac.nz', '1234', true);
     
-    -- add chests on the map
+
+	-- these 4 use the id's that are manually added to provied some higher tier items.
 	call SpawnChest(6562);
 	call SpawnChest(6563);
 	call SpawnChest(6564);
 	call SpawnChest(6565);
+
 	call SpawnChest(1523);
 	call SpawnChest(2351);
 	call SpawnChest(6431);
@@ -173,13 +177,7 @@ begin
 	call SpawnChest(1332);
 	call SpawnChest(1334);
     
-    -- add some items into chests
-
-        
-    -- update inventory_used of chests, this would be done in a procedure as the item is made.
-    
 	
-    -- add monsters to the map
 	call SpawnMonster(6500); 
 	call SpawnMonster(6500); 
 	call SpawnMonster(6500); 
@@ -206,15 +204,6 @@ begin
 	call SpawnMonster(6565); 
 
 
-    -- create some players add various stages of progress
---     insert into entity (account_id, health, attack, defense, healing, entity_type, tile_id)
--- 	values
--- 		(4, 250, 25, 25, 25, "player", 3281),
--- 		(5, 250, 25, 25, 25, "player", 462),
--- 		(6, 250, 25, 25, 25, "player", 1692),
--- 		(7, 250, 25, 25, 25, "player", 4023),
--- 		(8, 250, 25, 25, 25, "player", 5893);
---     
 
 	call CreatePlayer(1);
 	call CreatePlayer(2);
@@ -227,7 +216,6 @@ begin
 	call CreatePlayer(9);
 	
   
-    -- add some messages sent by the players
 	call SendMessage(1, "Hello ****heads!");
 	call SendMessage(2, "Hey!");
 	call SendMessage(3, "Ya-hallo!");

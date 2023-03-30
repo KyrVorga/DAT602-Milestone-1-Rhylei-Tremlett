@@ -23,7 +23,8 @@ select * from tile where tile_type = 'inventory';
 
 call CreateAccount("Pax", "pax@mars.net", "password");
 
-
+show function status;
+show procedure status;
 call CreatePlayer(1) 
 
 
