@@ -64,6 +64,7 @@ begin
 declare _x int default _width * -1;
 declare _y int default _height * -1;
 
+-- lock table and start a transaction 
 	while _x <= _width do
 		while _y <= _height do
 			insert into tile (x, y, tile_type)
@@ -78,13 +79,14 @@ end //
 delimiter ;
 
 
+
 drop procedure if exists GenerateInventory;
 delimiter //
 create procedure GenerateInventory(in _entity_id int, in _width int, in _height int)
 begin
-declare _x int default 0;
-declare _y int default 0;
-
+	declare _x int default 0;
+	declare _y int default 0;
+-- lock table and start a transaction 
 	while _x <= _width do
 		while _y <= _height do
 			insert into tile (x, y, tile_type, owner_id)
@@ -182,31 +184,33 @@ begin
 	into _home_tile
 	from tile
 	where x = 0 and y = 0 and tile_type = "ground";
-
-	insert into entity (
-		account_id,
-		entity_type,
-		health,
-		current_health,
-		attack,
-		defense,
-		healing,
-		tile_id,
-		killscore,
-		inventory_used
-	)
-	values (
-		_account_id,
-		"player",
-		1,
-		1,
-		1,
-		1,
-		1,
-		_home_tile,
-		0,
-		0
-	);
+	
+	set autocommit = off;
+	start transaction;
+		insert into entity (
+			account_id,
+			entity_type,
+			health,
+			current_health,
+			attack,
+			defense,
+			healing,
+			tile_id,
+			killscore,
+			inventory_used
+		)
+		values (
+			_account_id,
+			"player",
+			1,
+			1,
+			1,
+			1,
+			1,
+			_home_tile,
+			0,
+			0
+		);
 
 	select entity_id
 	into _player_id
@@ -214,6 +218,8 @@ begin
 	where account_id = _account_id;
 
 	call GenerateInventory(_player_id, 8, 4);
+
+	commit;
 end //
 delimiter ;
 
@@ -229,33 +235,38 @@ begin
 	
 	declare _origin_tile_owner int;
 	declare _target_tile_owner int;
+		
+	set autocommit = off;
+	start transaction;
 
-	set _origin_tile_owner = GetEntityIDFromInventoryTile(_origin_tile_id);
-	set _target_tile_owner = GetEntityIDFromInventoryTile(_target_tile_id);
+		set _origin_tile_owner = GetEntityIDFromInventoryTile(_origin_tile_id);
+		set _target_tile_owner = GetEntityIDFromInventoryTile(_target_tile_id);
 
+		update entity 
+		set tile_id = _target_tile_id,
+			owner_id = _target_tile_owner
+		where tile_id = _origin_tile_id;
+
+		-- find owners of origin and target tiles and update.
+		call UpdateEntityInventory(_origin_tile_owner);
+		call UpdateEntityInventory(_target_tile_owner);
 	
-	update entity 
-	set tile_id = _target_tile_id,
-		owner_id = _target_tile_owner
-	where tile_id = _origin_tile_id;
-	
-	-- find owners of origin and target tiles and update.
-	call UpdateEntityInventory(_origin_tile_owner);
-	call UpdateEntityInventory(_target_tile_owner);
+	commit;
 
 end //
 delimiter ;
 
 
+
 drop procedure if exists UpdateEntityInventory;
 delimiter //
 create procedure UpdateEntityInventory(in _entity_id int)
-begin
+begin	
 	
 	update entity
 	set inventory_used = (select count(entity_id) from (select * from entity) as e where owner_id = _entity_id)
 	where entity_id = _entity_id;
-		
+	
 end //
 delimiter ;
 
@@ -335,61 +346,65 @@ begin
 
 	-- find the distance of the chest from the center
 	declare _distance int;
+	
+	set autocommit = off;
+	start transaction;
 
-	select ceil(sqrt(pow(abs(t.x), 2) + pow(abs(t.x), 2)))
-	into _distance
-	from entity e 
-	join tile t
-		on t.tile_id = e.tile_id
-	where
-		e.entity_id = _chest_id;
-
-
-	set _type_mod = ceil(rand() *4);
-
-	if _type_mod = 1 then
-		set _item_type = "Armour ";
-		set _health = pow(_distance, 1.25);
-	end if;
-	if _type_mod = 2 then
-		set _item_type = "Sword ";
-		set _attack = pow(_distance, 1.25) / 5;
-	end if;
-	if _type_mod = 3 then
-		set _item_type = "Shield ";
-		set _defense = pow(_distance, 1.25) / 5;
-	end if;
-	if _type_mod = 4 then
-		set _item_type = "Amulet ";
-		set _healing = pow(_distance, 1.25) / 10;
-	end if;
+		select ceil(sqrt(pow(abs(t.x), 2) + pow(abs(t.x), 2)))
+		into _distance
+		from entity e 
+		join tile t
+			on t.tile_id = e.tile_id
+		where
+			e.entity_id = _chest_id;
 	
 	
-	-- determine the tier
-    set _tier = CalculateTier(_distance);
+		set _type_mod = ceil(rand() *4);
 	
-	inventory_tile_loop: loop
-		set _x = ceil(rand() *8);
-		set _y = ceil(rand() *4);
-		if (select tile_id from tile where x = _x and y = _y and tile_type = "inventory" and owner_id = _chest_id) != null
-			then iterate inventory_tile_loop;
+		if _type_mod = 1 then
+			set _item_type = "Armour ";
+			set _health = pow(_distance, 1.25);
 		end if;
-		set _inventory_tile = (select tile_id from tile where x = _x and y = _y and tile_type = "inventory" and owner_id = _chest_id);
-		leave inventory_tile_loop;	
-	end loop inventory_tile_loop;
-	
-	-- create the new item
-	insert into entity (name, health, attack, defense, healing, entity_type, owner_id, tile_id)
-	values (
-		concat(_item_type, _tier),
-		ceil((rand() * (1.3 - 0.7) + 0.7) * _health),
-		ceil((rand() * (1.3 - 0.7) + 0.7) * _attack),
-		ceil((rand() * (1.3 - 0.7) + 0.7) * _defense),
-		ceil((rand() * (1.3 - 0.7) + 0.7) * _healing),
-		"item",
-		_chest_id,
-		_inventory_tile
-	);
+		if _type_mod = 2 then
+			set _item_type = "Sword ";
+			set _attack = pow(_distance, 1.25) / 5;
+		end if;
+		if _type_mod = 3 then
+			set _item_type = "Shield ";
+			set _defense = pow(_distance, 1.25) / 5;
+		end if;
+		if _type_mod = 4 then
+			set _item_type = "Amulet ";
+			set _healing = pow(_distance, 1.25) / 10;
+		end if;
+		
+		
+		-- determine the tier
+	    set _tier = CalculateTier(_distance);
+		
+		inventory_tile_loop: loop
+			set _x = ceil(rand() *8);
+			set _y = ceil(rand() *4);
+			if (select tile_id from tile where x = _x and y = _y and tile_type = "inventory" and owner_id = _chest_id) != null
+				then iterate inventory_tile_loop;
+			end if;
+			set _inventory_tile = (select tile_id from tile where x = _x and y = _y and tile_type = "inventory" and owner_id = _chest_id);
+			leave inventory_tile_loop;	
+		end loop inventory_tile_loop;
+		
+		-- create the new item
+		insert into entity (name, health, attack, defense, healing, entity_type, owner_id, tile_id)
+		values (
+			concat(_item_type, _tier),
+			ceil((rand() * (1.3 - 0.7) + 0.7) * _health),
+			ceil((rand() * (1.3 - 0.7) + 0.7) * _attack),
+			ceil((rand() * (1.3 - 0.7) + 0.7) * _defense),
+			ceil((rand() * (1.3 - 0.7) + 0.7) * _healing),
+			"item",
+			_chest_id,
+			_inventory_tile
+		);
+	commit;
 end //
 delimiter ;
 
@@ -572,5 +587,35 @@ begin
 insert into message (account_id, message, sent_time)
 values (_account_id, _message, current_timestamp());	
 	
+end //
+delimiter ;
+
+
+
+drop function if exists GetTiles;
+delimiter //
+create function GetTiles(_tile_id int, _target_tile int)
+returns boolean deterministic
+begin
+
+	declare _row int;
+	declare _col int;
+    
+    select `row` into _row
+    from tblTile
+    where id = _tile_id;  
+    
+    select `col` into _col
+    from tblTile
+    where id = _tile_id;
+
+	if _target_tile in (
+		select id
+		from tblTile
+		where `row` between _row -1 and _row +1
+		and `col` between _col -1 and _col +1
+    ) then return true;
+    end if;
+    return false;
 end //
 delimiter ;
