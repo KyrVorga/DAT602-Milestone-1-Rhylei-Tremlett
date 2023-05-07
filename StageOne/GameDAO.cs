@@ -78,8 +78,8 @@ namespace StageOne
                 Value = 10
             };
             procedure_params.Add(_player_id);
+            procedure_params.Add(_viewport_width);
             procedure_params.Add(_viewport_height);
-            procedure_params.Add(_player_id);
 
             DataSet query_result = MySqlHelper.ExecuteDataset(DatabaseAccessObject.MySqlConnection, "call GetTilesByPlayer(@player_id, @viewport_width, @viewport_height)", procedure_params.ToArray());
 

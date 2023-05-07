@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\OneDrive - NMIT\\Documents\\Course\\DAT602\\Assessments\\DAT602-Project\\StageOne\\StageOne.csproj": {}
+    "C:\\Workspace\\DAT602-Milestone-1-Rhylei-Tremlett\\StageOne\\StageOne.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\OneDrive - NMIT\\Documents\\Course\\DAT602\\Assessments\\DAT602-Project\\StageOne\\StageOne.csproj": {
+    "C:\\Workspace\\DAT602-Milestone-1-Rhylei-Tremlett\\StageOne\\StageOne.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\OneDrive - NMIT\\Documents\\Course\\DAT602\\Assessments\\DAT602-Project\\StageOne\\StageOne.csproj",
+        "projectUniqueName": "C:\\Workspace\\DAT602-Milestone-1-Rhylei-Tremlett\\StageOne\\StageOne.csproj",
         "projectName": "StageOne",
-        "projectPath": "C:\\Users\\User\\OneDrive - NMIT\\Documents\\Course\\DAT602\\Assessments\\DAT602-Project\\StageOne\\StageOne.csproj",
+        "projectPath": "C:\\Workspace\\DAT602-Milestone-1-Rhylei-Tremlett\\StageOne\\StageOne.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\OneDrive - NMIT\\Documents\\Course\\DAT602\\Assessments\\DAT602-Project\\StageOne\\obj\\",
+        "outputPath": "C:\\Workspace\\DAT602-Milestone-1-Rhylei-Tremlett\\StageOne\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
