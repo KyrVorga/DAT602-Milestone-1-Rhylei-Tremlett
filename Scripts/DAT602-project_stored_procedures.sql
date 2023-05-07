@@ -591,31 +591,3 @@ end //
 delimiter ;
 
 
-
-drop function if exists GetTiles;
-delimiter //
-create function GetTiles(_tile_id int, _target_tile int)
-returns boolean deterministic
-begin
-
-	declare _row int;
-	declare _col int;
-    
-    select `row` into _row
-    from tblTile
-    where id = _tile_id;  
-    
-    select `col` into _col
-    from tblTile
-    where id = _tile_id;
-
-	if _target_tile in (
-		select id
-		from tblTile
-		where `row` between _row -1 and _row +1
-		and `col` between _col -1 and _col +1
-    ) then return true;
-    end if;
-    return false;
-end //
-delimiter ;

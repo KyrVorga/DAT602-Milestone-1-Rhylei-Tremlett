@@ -60,5 +60,36 @@ namespace StageOne
             }
             else return false;
         }
+
+        public List<String> GetTilesByPlayer(int player_id)
+        {
+
+            List<MySqlParameter> procedure_params = new List<MySqlParameter>();
+            MySqlParameter _player_id = new("@player_id", MySqlDbType.Int32)
+            {
+                Value = player_id
+            };
+            MySqlParameter _viewport_width = new("@viewport_width", MySqlDbType.Int32)
+            {
+                Value = 10
+            };
+            MySqlParameter _viewport_height = new("@viewport_height", MySqlDbType.Int32)
+            {
+                Value = 10
+            };
+            procedure_params.Add(_player_id);
+            procedure_params.Add(_viewport_height);
+            procedure_params.Add(_player_id);
+
+            DataSet query_result = MySqlHelper.ExecuteDataset(DatabaseAccessObject.MySqlConnection, "call GetTilesByPlayer(@player_id, @viewport_width, @viewport_height)", procedure_params.ToArray());
+
+            var tile_list = new List<String>();
+            foreach (DataRow row in query_result.Tables[0].Rows)
+            {
+                tile_list.Add(row[0].ToString());
+            }
+
+            return tile_list;
+        }
     }
 }

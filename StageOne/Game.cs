@@ -18,12 +18,18 @@ namespace StageOne
         private SettingsAdmin _settings_admin;
         private SettingsUser _settings_user;
         private String _username;
+        private int _form_height;
+        private int _form_width;
 
         public Game(Login login, String username)
         {
             _login_form = login;
             _username = username;
+            _form_height = this.Height;
+            _form_width = this.Width;
+
             InitializeComponent();
+            GenerateBoard();
         }
 
         private void update_chat_button_Click(object sender, EventArgs e)
@@ -64,6 +70,30 @@ namespace StageOne
                 SettingsUser user = new SettingsUser(this);
                 user.Show();
             }
+        }
+
+        private void GenerateBoard()
+        {
+            PictureBox pictureBox;
+
+            for (int row = 10; row < 10; row++)
+            {
+                for (int col = 10; col < 10; col++)
+                {
+                    pictureBox = new PictureBox();
+                    pictureBox.BackColor = Color.Gray;
+                    pictureBox.Width = 50;
+                    pictureBox.Height = 50;
+
+                    pictureBox.Location = new Point(100 + (row * pictureBox.Height + 1), 100 + (col * pictureBox.Width + 1));
+                }
+            }
+        }
+
+        private void GetTilesTest_Click(object sender, EventArgs e)
+        {
+            GameDAO db_connection = new();
+            UpdateListbox(Tiles, db_connection.GetTilesByPlayer(80));
         }
     }
 }
